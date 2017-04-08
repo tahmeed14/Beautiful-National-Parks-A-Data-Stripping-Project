@@ -22,9 +22,37 @@ try:
 	cache_data = f.read()
 	f.close()
 	CACHE_DICTION = json.loads(cache_data) #Dump data into Cache Dictionary
-
 except:
 	CACHE_DICTION = {} #Create Cache Dictionary
+
+
+# Personal Function I created to be used in get_parks_data. This function returns a list of all the links of the states containing all the parks in that
+# state. This is how I initially started to think about my project and I think it will work. So I went with it. 
+def get_state_page():
+	state_identifier = "parks_by_state"
+	natty_park_site = "https://www.nps.gov/index.htm"
+
+	if state_identifier in CACHE_DICTION:
+		stateslink_list = CACHE_DICTION[state_identifier]
+
+	else:
+		print("Stripping Online Data")
+		
+		request_park_data = requests.get(natty_park_site).text
+		soup_var1 = BeautifulSoup(request_park_data, "html.parser")
+		states_button = soup_var1.find("div", {"class" : "SearchBar-keywordSearch input-group input-group-lg"})
+		drop_down_menu = states_button.find("ul", {"class" : "dropdown-menu SearchBar-keywordSearch"})
+		states_link = drop_down_menu.find_all("a")
+		states_page_list = [a["href"] for a in states_link]
+		stateslink_list = ["https://www.nps.gov" + i for i in states_page_list]
+
+		CACHE_DICTION[state_identifier] = stateslink_list
+
+		f = open(CACHE_FILENAME, "w") #Reference lecture + previous hw to format, simple.
+		f.write(json.dumps(CACHE_DICTION))
+		f.close()
+
+	return stateslink_list
 
 # Get data from the National Parks website using BeautifulSoup, which has a lot of hierarchy of links inside it. 
 # The root page is: https://www.nps.gov/index.htm 
@@ -33,54 +61,41 @@ except:
 # Each HTML string should contain all the data you need, like what state(s) the park is in, the park's name, etc… so you could pass each HTML string 
 # straight into a class constructor!
 
-def get_parks_data():
-	parks_identifier = "natty_parks_data"
-	natty_park_site = "https://www.nps.gov/index.htm"
+# def get_parks_data():
+# 	link_list = get_state_page()
+
+# 	parks_identifier = "natty_parks_data"
 	
-	if parks_identifier in CACHE_DICTION:
-		print("Accessing Cached Data for National Parks")
-		nattyparks_str_lst = CACHE_DICTION[parks_identifier]
+# 	for i in link_list:
+# 		if parks_identifier in CACHE_DICTION:
+# 			print("Accessing Cached Data for National Parks")
+# 			nattyparks_str_lst = CACHE_DICTION[parks_identifier]
 
-		# umich_resp1 = requests.get(base_url).text
-
-		# umich_resp = BeautifulSoup(umich_resp1,"html.parser")
-		# sub_div = umich_resp.find("div",{"id":"in-the-news"}) #Do we want class = 
-		# news_articles_set = sub_div.find("ul",{"class":"news-items"})
-
-		# pe_articles_set = sub_div.find("ul",{"class":"pe-items"})
-		# news_links = news_articles_set.find_all("a") #
-		# pe_links = pe_articles_set.find_all("a")
-		# total_article_elements = news_links + pe_links
+# 		else:
+# 		print("Stripping Online Data")
+# 		nattyparks_str_lst = [] #Initialize List
+# 		request_park_data = requests.get(natty_park_site)
 		
-		# article_html_urls = [elem["href"] for elem in total_article_elements]
-		# print(article_html_urls)
-		# article_html_tups = [(requests.get(url).text, url)  for url in article_html_urls]
-	
-	else:
-		print("Stripping Online Data")
-		nattyparks_str_lst = [] #Initialize List
-		request_park_data = requests.get(natty_park_site)
+# 		print(request_park_data)
+
+# 		# soup_var = BeautifulSoup(request_park_data, "html.parser")
+# 		# print(soup_var)
+
+# 		# print("****************************************************************************************************************************************")
+# 		# states_button = soup_var.find("div", {"class" : "SearchBar-keywordSearch input-group input-group-lg"})
+# 		# print(states_button)
 		
-		print(request_park_data)
+# 		#parks_html = request_park_data.text # .text let's us put html in string format
 
-		# soup_var = BeautifulSoup(request_park_data, "html.parser")
-		# print(soup_var)
+# 		#nattyparks_str_lst.append(parks_html)
 
-		# print("****************************************************************************************************************************************")
-		# states_button = soup_var.find("div", {"class" : "SearchBar-keywordSearch input-group input-group-lg"})
-		# print(states_button)
-		
-		#parks_html = request_park_data.text # .text let's us put html in string format
+# 		CACHE_DICTION[parks_identifier] = nattyparks_str_lst
 
-		#nattyparks_str_lst.append(parks_html)
+# 		f = open(CACHE_FILENAME, "w")
+# 		f.write(json.dumps(CACHE_DICTION)) #dump html strings into file
+# 		f.close()
 
-		CACHE_DICTION[parks_identifier] = nattyparks_str_lst
-
-		f = open(CACHE_FILENAME, "w")
-		f.write(json.dumps(CACHE_DICTION)) #dump html strings into file
-		f.close()
-
-	return nattyparks_str_lst
+# 	return nattyparks_str_lst
 
 
 
@@ -116,41 +131,7 @@ def get_parks_data():
 # 	print(article_html_urls)
 # 	article_html_tups = [(requests.get(url).text, url)  for url in article_html_urls]
 
-def get_state_page():
-	state_identifier = "parks_by_state"
-	natty_park_site = "https://www.nps.gov/index.htm"
 
-	if state_identifier in CACHE_DICTION:
-		stateslink_list = CACHE_DICTION[state_identifier]
-
-	print("Stripping Online Data")
-	nattyparks_str_lst = [] #Initialize List
-	natty_park_site = "https://www.nps.gov/index.htm"
-
-	request_park_data = requests.get(natty_park_site).text
-		
-#print(request_park_data)
-
-	soup_var1 = BeautifulSoup(request_park_data, "html.parser")
-print(soup_var1)
-
-	states_button = soup_var1.find("div", {"class" : "SearchBar-keywordSearch input-group input-group-lg"})
-print("****************************************************************************************************************************************")
-#print(states_button)
-
-	drop_down_menu = states_button.find("ul", {"class" : "dropdown-menu SearchBar-keywordSearch"})
-print("****************************************************************************************************************************************")
-#print(drop_down_menu)
-
-	states_link = drop_down_menu.find_all("a")
-print(states_link)
-
-	states_page_list = [a["href"] for a in states_link]
-
-	stateslink_list = ["https://www.nps.gov/" + i for i in states_page_list]
-
-print(stateslink_list)
-print(len(stateslink_list))
 
 # stateparks_a = states_link.find_all("a") #find_all just in case!
 # print(stateparks_a)
@@ -195,25 +176,39 @@ print(len(stateslink_list))
 # Write your test cases here.
 # print("\n\n ********** TESTS (PASS/FAIL) **********\n")
 
-# class Test_Initial_Caching(unittest.TestCase):
+class Test_Initial_Caching(unittest.TestCase):
 
-# 	def test1_cachefile(self):
-# 		file = open("si206final_project_cache.json","r")
-# 		read_var = file.read()
-# 		file.close()
-# 		self.assertEqual(type(read_var),type(""),"Something wrong with Cache file, open file from directory and evaluate")
+	def test1_cachefile(self):
+		file = open("si206final_project_cache.json","r")
+		read_var = file.read()
+		file.close()
+		self.assertEqual(type(read_var),type(""),"Something wrong with Cache file, open file from directory and evaluate")
 
-# 	def test2_cachedict(self):
-# 		random_dict = {}
-# 		self.assertEqual(type(CACHE_DICTION),type(random_dict), "CACHE_DICTION IS MISSING")
+	def test2_cachedict(self):
+		random_dict = {}
+		self.assertEqual(type(CACHE_DICTION),type(random_dict), "CACHE_DICTION IS MISSING")
 
-# 	def test3_cachedict(self):
-# 		if "natty_parks_data" in CACHE_DICTION:
-# 			x = "blah"
-# 			self.assertEqual(type(x), type("stats"))
-# 		else:
-# 			x = 1
-# 			self.assertEqual(type(x), type("stats"), "CACHE DICTION does not have your unique identifier!")
+	def test3_cachedict(self):
+		if "natty_parks_data" in CACHE_DICTION:
+			x = "blah"
+			self.assertEqual(type(x), type("stats"))
+		else:
+			x = 1
+			self.assertEqual(type(x), type("stats"), "CACHE DICTION does not have your unique identifier!")
+
+class Test_StatesData(unittest.TestCase):
+
+	def test1_return_type(self):
+		x = get_state_page()
+		self.assertEqual(type(x), type([]))
+		
+	def test2_return_len(self):
+		y = get_state_page()
+		self.assertEqual(len(y), 56, "This function must return a list with 56 elements because there are 56 states on the website")
+
+	def test3_last_state(self):
+		z = get_state_page()[55]
+		self.assertEqual(x, "https://www.nps.gov/state/wy/index.htm", "Something is wrong with the link for Wyoming")
 
 # class Test_ParksData(unittest.TestCase):
 
@@ -225,8 +220,8 @@ print(len(stateslink_list))
 	
 
 
-# if __name__ == "__main__":
-# 	unittest.main(verbosity=2)
+if __name__ == "__main__":
+	unittest.main(verbosity=2)
 
 
 ## Remember to invoke all your tests...
