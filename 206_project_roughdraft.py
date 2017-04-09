@@ -152,31 +152,36 @@ def get_parks_data():
 # Write a function to get and cache HTML data from each of the articles on the front page of the main NPS website. An example of an article can be found 
 # at https://home.nps.gov/ever/wilderness.htm -- which you get to by clicking on this displayed link on the front page of NPS.gov, for example:
 
-# def get_articles_data():
-# 	articles_identifier = "articles_data"
-# 	article_stripped_site = "https://home.nps.gov/ever/wilderness.htm"
+def get_articles_data():
+	articles_identifier = "articles_data"
+	natty_park_site = "https://www.nps.gov/index.htm"
 
-natty_park_site = "https://www.nps.gov/index.htm"
+	if articles_identifier in CACHE_DICTION:
+		html_articles_list = CACHE_DICTION[articles_identifier]
 
-request_park_data = requests.get(natty_park_site).text
-soup_var3 = BeautifulSoup(request_park_data, "html.parser")
+	else:
+		request_park_data = requests.get(natty_park_site).text
+		soup_var3 = BeautifulSoup(request_park_data, "html.parser")
+		big_container = soup_var3.find("div", {"class" : "MainContent"})
+		#print(big_container)
+		row_container = big_container.find("div", {"class" : "FeatureGrid-item col-xs-12"})
+		#row_container = big_container.find("div", {"class" : "row"})
+		#print(row_container)
+		articles_a = row_container.find_all("a")
+		#print(articles_a)
+		article_sub_urls = [a["href"] for a in articles_a]
+		#print(article_sub_urls)
+		article_dummy_list = ["https://www.nps.gov" + url for url in article_sub_urls]
+		#print(article_dummy_list)
+		html_articles_list = [requests.get(link).text for link in article_dummy_list]
+		#print(html_articles_list[0])
+		CACHE_DICTION[articles_identifier] = html_articles_list
 
-big_container = soup_var3.find("div", {"class" : "MainContent"})
-#print(big_container)
-row_container = big_container.find("div", {"class" : "FeatureGrid-item col-xs-12"})
-#row_container = big_container.find("div", {"class" : "row"})
-#print(row_container)
-articles_a = row_container.find_all("a")
-#print(articles_a)
-article_sub_urls = [a["href"] for a in articles_a]
-print(article_sub_urls)
+		f = open(CACHE_FILENAME, "w") #Reference lecture + previous hw to format, simple.
+		f.write(json.dumps(CACHE_DICTION))
+		f.close()
 
-
-# f = open(CACHE_FILENAME, "w") #Reference lecture + previous hw to format, simple.
-# f.write(json.dumps(CACHE_DICTION))
-# f.close()
-
-
+y = get_articles_data()
 
 
 
