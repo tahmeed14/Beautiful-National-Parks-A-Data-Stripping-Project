@@ -68,11 +68,30 @@ def get_parks_data():
 	
 	for i in link_list:
 		if parks_identifier in CACHE_DICTION:
-			print("Accessing Cached Data for National Parks")
+			#print("Accessing Cached Data for National Parks")
 			nattyparks_str_lst = CACHE_DICTION[parks_identifier]
 
 		else:
 			stripped_data = requests.get(i).text
+			soup_var2 = BeautifulSoup(stripped_data, "html.parser") 
+			column_grid = soup_var2.find("div", {"class" : "ColumnMain col-sm-12"}) #Nested HTML 
+			park_names = column_grid.find_all("h3") #Under h3
+			park_a = [i.find("a") for i in park_names] #All elements with a has href
+			park_link_list = [a["href"] for a in park_a] #index href to get links
+			dummy_url_lst = ["https://www.nps.gov" + href + "index.htm" for href in park_link_list] #Need appropriate url, thus, we add two extra str's
+			
+			nattyparks_str_lst = [requests.get(link).text for link in dummy_url_lst] # Constructed by referring to beautsoup_example_errors.py
+
+			CACHE_DICTION[parks_identifier] = nattyparks_str_lst #Dictionary key value pair
+
+			#Write it into cache file
+			f = open(CACHE_FILENAME, "w")
+			f.write(json.dumps(CACHE_DICTION))
+			f.close()
+
+	return nattyparks_str_lst
+
+
 # 		else:
 # 		print("Stripping Online Data")
 # 		nattyparks_str_lst = [] #Initialize List
@@ -98,22 +117,26 @@ def get_parks_data():
 # 		f.close()
 
 # 	return nattyparks_str_lst
-link_list = get_state_page()
+# link_list = get_state_page()
 
-stripped_data = requests.get(link_list[0]).text
-soup_var2 = BeautifulSoup(stripped_data, "html.parser")
+# stripped_data = requests.get(link_list[55]).text
+# soup_var2 = BeautifulSoup(stripped_data, "html.parser")
 
-column_grid = soup_var2.find("div", {"class" : "ColumnMain col-sm-12"})
+# column_grid = soup_var2.find("div", {"class" : "ColumnMain col-sm-12"})
 
-park_names = column_grid.find_all("h3")
-print(park_names)
-print(type(park_names))
+# park_names = column_grid.find_all("h3")
+# # print(park_names)
+# # print(type(park_names))
 
-park_a = [i.find("a") for i in park_names]
-print(park_a)
+# park_a = [i.find("a") for i in park_names]
+# # print(park_a)
 
-park_link_list = [a["href"] for a in park_a]
-print(park_link_list)
+# park_link_list = [a["href"] for a in park_a]
+# # print(park_link_list)
+
+# dummy_url_lst = ["https://www.nps.gov" + href + "index.htm" for href in park_link_list]
+
+# nattyparks_str_lst = [requests.get(link).text for link in dummy_url_lst]
 
 
 # park_link_list = [a["href"] for a in park_a]
@@ -133,6 +156,25 @@ print(park_link_list)
 # 	articles_identifier = "articles_data"
 # 	article_stripped_site = "https://home.nps.gov/ever/wilderness.htm"
 
+natty_park_site = "https://www.nps.gov/index.htm"
+
+request_park_data = requests.get(natty_park_site).text
+soup_var3 = BeautifulSoup(request_park_data, "html.parser")
+
+big_container = soup_var3.find("div", {"class" : "MainContent"})
+#print(big_container)
+row_container = big_container.find("div", {"class" : "FeatureGrid-item col-xs-12"})
+#row_container = big_container.find("div", {"class" : "row"})
+#print(row_container)
+articles_a = row_container.find_all("a")
+#print(articles_a)
+article_sub_urls = [a["href"] for a in articles_a]
+print(article_sub_urls)
+
+
+# f = open(CACHE_FILENAME, "w") #Reference lecture + previous hw to format, simple.
+# f.write(json.dumps(CACHE_DICTION))
+# f.close()
 
 
 
@@ -236,13 +278,15 @@ class Test_StatesData(unittest.TestCase):
 		z = get_state_page()[55]
 		self.assertEqual(z, "https://www.nps.gov/state/wy/index.htm", "Something is wrong with the link for Wyoming")
 
-# class Test_ParksData(unittest.TestCase):
+class Test_ParksData(unittest.TestCase):
 
-# 	# def test1_list(self):
-# 	# 	self.assertEqual(type(get_parks_data()), type(["a","beta", "see"]), "The returned value for this function is not a list looks like")
+	def test1_ret_type(self):
+		self.assertEqual(type(get_parks_data()), type(["a","beta", "see"]), "The returned value for this function is not a list looks like")
 
-# 	# def test2_list(self):
-# 	# 	self.assertEqual(type(get_parks_data()[0]), type("alpha"), "The first element in get_parks_data list is not a string")
+	def test2_listelemtype(self):
+		self.assertEqual(type(get_parks_data()[0]), type("alpha"), "The first element in get_parks_data list is not a string")
+
+	
 	
 
 
