@@ -65,29 +65,35 @@ def get_parks_data():
 	link_list = get_state_page()
 
 	parks_identifier = "natty_parks_data"
-	
-	for i in link_list:
-		if parks_identifier in CACHE_DICTION:
+		
+	if parks_identifier in CACHE_DICTION:
 			#print("Accessing Cached Data for National Parks")
-			nattyparks_str_lst = CACHE_DICTION[parks_identifier]
+		nattyparks_str_lst = CACHE_DICTION[parks_identifier]
 
-		else:
+	else:
+		nattyparks_str_lst = []
+		for i in link_list:
+			print("Loop Counter")
 			stripped_data = requests.get(i).text
 			soup_var2 = BeautifulSoup(stripped_data, "html.parser") 
 			column_grid = soup_var2.find("div", {"class" : "ColumnMain col-sm-12"}) #Nested HTML 
 			park_names = column_grid.find_all("h3") #Under h3
-			park_a = [i.find("a") for i in park_names] #All elements with a has href
+			park_a = [x.find("a") for x in park_names] #All elements with a has href
 			park_link_list = [a["href"] for a in park_a] #index href to get links
 			dummy_url_lst = ["https://www.nps.gov" + href + "index.htm" for href in park_link_list] #Need appropriate url, thus, we add two extra str's
 			
-			nattyparks_str_lst = [requests.get(link).text for link in dummy_url_lst] # Constructed by referring to beautsoup_example_errors.py
+			nattyparks_str_dummy = [requests.get(link).text for link in dummy_url_lst] # Constructed by referring to beautsoup_example_errors.py
 
-			CACHE_DICTION[parks_identifier] = nattyparks_str_lst #Dictionary key value pair
+			for b in nattyparks_str_dummy:
+				nattyparks_str_lst.append(b)
+
+
+		CACHE_DICTION[parks_identifier] = nattyparks_str_lst #Dictionary key value pair
 
 			#Write it into cache file
-			f = open(CACHE_FILENAME, "w")
-			f.write(json.dumps(CACHE_DICTION))
-			f.close()
+		f = open(CACHE_FILENAME, "w")
+		f.write(json.dumps(CACHE_DICTION))
+		f.close()
 
 	return nattyparks_str_lst
 
@@ -181,7 +187,10 @@ def get_articles_data():
 		f.write(json.dumps(CACHE_DICTION))
 		f.close()
 
-y = get_articles_data()
+	return html_articles_list
+
+y = get_parks_data()
+print(len(y))
 
 
 
@@ -267,7 +276,7 @@ class Test_Initial_Caching(unittest.TestCase):
 			self.assertEqual(type(x), type("stats"))
 		else:
 			x = 1
-			self.assertEqual(type(x), type("stats"), "CACHE DICTION does not have your unique identifier!")
+			self.assertEqual(type(x), type("stats"), "CACHE DICTION does not have your unique identifier for parks data!")
 
 class Test_StatesData(unittest.TestCase):
 
@@ -279,7 +288,11 @@ class Test_StatesData(unittest.TestCase):
 		y = get_state_page()
 		self.assertEqual(len(y), 56, "This function must return a list with 56 elements because there are 56 states on the website")
 
-	def test3_last_state(self):
+	def test3_michigan(self):
+		greatest_state_but_the_weather_sucks = get_state_page()[24]
+		self.assertEqual(greatest_state_but_the_weather_sucks, 'https://www.nps.gov/state/mi/index.htm' )
+
+	def test4_last_state(self):
 		z = get_state_page()[55]
 		self.assertEqual(z, "https://www.nps.gov/state/wy/index.htm", "Something is wrong with the link for Wyoming")
 
@@ -291,7 +304,28 @@ class Test_ParksData(unittest.TestCase):
 	def test2_listelemtype(self):
 		self.assertEqual(type(get_parks_data()[0]), type("alpha"), "The first element in get_parks_data list is not a string")
 
-	
+	# def test3_len_return(self):
+	# 	self.assertEqual(len(get_parks_data()), , "There should be a lot of parks and monuments")
+
+class Test_ArticlesData(unittest.TestCase):
+
+	def test1_ret_type_art(self):
+		self.assertEqual(type(get_articles_data()), type(["Chelsea FC, Premier League Champs"]))
+
+	def test2_elem_type(self):
+		self.assertEqual(type(get_articles_data()[-1]), type(""), "Last element in returned value is not a str")
+		self.assertEqual(type(get_articles_data()[0]), type(""), "First element in returned value is not a str")
+
+	def test3_len_return(self):
+		#AS OF RIGHT NOW, the homepage has only 2 articles but this actually may change. So this test will be tentative...
+		self.assertEqual(len(get_articles_data()), 2)
+
+	def test4_cachedict(self):
+		if "articles_data" in CACHE_DICTION:
+			x = "blah"
+		else:
+			x = 1
+		self.assertEqual(type(x), type("stats"), "CACHE DICTION does not have your unique identifier for articles data!")
 	
 
 
