@@ -81,7 +81,8 @@ def get_parks_data():
 			park_a = [x.find("a") for x in park_names] #All elements with a has href
 			park_link_list = [a["href"] for a in park_a] #index href to get links
 			dummy_url_lst = ["https://www.nps.gov" + href + "index.htm" for href in park_link_list] #Need appropriate url, thus, we add two extra str's
-			
+			# An example link: https://www.nps.gov/state/al/index.htm
+
 			nattyparks_str_dummy = [requests.get(link).text for link in dummy_url_lst] # Constructed by referring to beautsoup_example_errors.py
 
 			for b in nattyparks_str_dummy:
@@ -190,14 +191,20 @@ def get_articles_data():
 	return html_articles_list
 
 y = get_parks_data()
-print(len(y))
+print(type(y[0]))
 
 
 
+class NationalPark(object):
+	# Potential class variables
 
+	def __init__(self, html_string):	
+		self.class_soup = BeautifulSoup(html_string, "html.parser")
+		
+		park_title = self.class_soup.find("div", {"class" : "Hero-titleContainer clearfix"})
+		
+		self.name = 
 
-# class NationalPark(object):
-# 	def __init__(self, html_string):
 
 # umich_resp1 = requests.get(base_url).text
 
