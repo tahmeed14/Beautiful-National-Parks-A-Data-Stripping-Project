@@ -193,17 +193,100 @@ def get_articles_data():
 y = get_parks_data()
 print(type(y[0]))
 
+park_soup = BeautifulSoup(y[21], "html.parser")
+park_title_div = park_soup.find("div", {'class' : "Hero-titleContainer clearfix"})
+#print(park_title_div)
+park_title = park_title_div.find("a").text
+#print(park_title)
 
+park_state_div = park_soup.find("div", {"class" : "Hero-designationContainer"})
+states = park_state_div.find("span", {"class" : "Hero-location"}).text
+print(states)
+
+desc_div = park_soup.find("div", {'class' : "Component text-content-size text-content-style"})
+desc = desc_div.find("p").text
+print(desc)
 
 class NationalPark(object):
 	# Potential class variables
-
+	states = {
+        'AK': 'Alaska',
+        'AL': 'Alabama',
+        'AR': 'Arkansas',
+        'AS': 'American Samoa',
+        'AZ': 'Arizona',
+        'CA': 'California',
+        'CO': 'Colorado',
+        'CT': 'Connecticut',
+        'DC': 'District of Columbia',
+        'DE': 'Delaware',
+        'FL': 'Florida',
+        'GA': 'Georgia',
+        'GU': 'Guam',
+        'HI': 'Hawaii',
+        'IA': 'Iowa',
+        'ID': 'Idaho',
+        'IL': 'Illinois',
+        'IN': 'Indiana',
+        'KS': 'Kansas',
+        'KY': 'Kentucky',
+        'LA': 'Louisiana',
+        'MA': 'Massachusetts',
+        'MD': 'Maryland',
+        'ME': 'Maine',
+        'MI': 'Michigan',
+        'MN': 'Minnesota',
+        'MO': 'Missouri',
+        'MP': 'Northern Mariana Islands',
+        'MS': 'Mississippi',
+        'MT': 'Montana',
+        'NA': 'National',
+        'NC': 'North Carolina',
+        'ND': 'North Dakota',
+        'NE': 'Nebraska',
+        'NH': 'New Hampshire',
+        'NJ': 'New Jersey',
+        'NM': 'New Mexico',
+        'NV': 'Nevada',
+        'NY': 'New York',
+        'OH': 'Ohio',
+        'OK': 'Oklahoma',
+        'OR': 'Oregon',
+        'PA': 'Pennsylvania',
+        'PR': 'Puerto Rico',
+        'RI': 'Rhode Island',
+        'SC': 'South Carolina',
+        'SD': 'South Dakota',
+        'TN': 'Tennessee',
+        'TX': 'Texas',
+        'UT': 'Utah',
+        'VA': 'Virginia',
+        'VI': 'Virgin Islands',
+        'VT': 'Vermont',
+        'WA': 'Washington',
+        'WI': 'Wisconsin',
+        'WV': 'West Virginia',
+        'WY': 'Wyoming'
+}
 	def __init__(self, html_string):	
-		self.class_soup = BeautifulSoup(html_string, "html.parser")
 		
-		park_title = self.class_soup.find("div", {"class" : "Hero-titleContainer clearfix"})
+		self.park_soup = BeautifulSoup(html_string, "html.parser") #Soup instance for the park
 		
-		self.name = 
+		park_title_div = self.park_soup.find("div", {"class" : "Hero-titleContainer clearfix"})
+		self.name = park_title_div.find("a").text #Name of the park
+
+		park_state_div = self.park_soup.find("div", {"class" : "Hero-designationContainer"})
+		self.states = park_state_div.find("span", {"class" : "Hero-location"}).text
+
+	def __str__(self):
+		return "{} is located in {}".format(self.name, self.states)
+
+	def get_parkdescript(self):
+		desc_div = self.park_soup.find("div", {'class' : "Component text-content-size text-content-style"})
+		desc = desc_div.find("p").text
+		return desc
+
+	def 
 
 
 # umich_resp1 = requests.get(base_url).text
@@ -334,7 +417,30 @@ class Test_ArticlesData(unittest.TestCase):
 			x = 1
 		self.assertEqual(type(x), type("stats"), "CACHE DICTION does not have your unique identifier for articles data!")
 	
+class Test_NatParks_Class(unittest.TestCase):
 
+	def test1_instance_variables(self):
+		birmingham_crp = NationalPark(get_parks_data()[0])
+		park_name1 = "Birmingham Civil Rights"
+		self.assertEqual(birmingham_crp.name, park_name1)
+		self.assertEqual(birmingham_crp.states, "Alabama")
+
+		katmai = NationalPark(get_parks_data()[21])
+		park_name2 = "Katmai"
+		self.assertEqual(katmai.name, park_name2)
+		self.assertEqual(katmai.states, "Alaska")
+
+		ww2_valor = NationalPark(get_parks_data()[28])
+		park_name3 = "World War II Valor in the Pacific"
+		#print(ww2_valor.states)
+		self.assertEqual(ww2_valor.name, park_name3)
+		self.assertEqual(ww2_valor.states, "HI, AK, CA")
+
+	def desc_method(self):
+		katmai = NationalPark(get_parks_data()[21])
+		park_desc = "Katmai National Monument was established in 1918 to protect the volcanically devastated region surrounding Mount Katmai and the Valley of Ten Thousand Smokes. Today, Katmai National Park and Preserve remains an active volcanic landscape, but it also protects 9,000 years of human history as well as important habitat for salmon and thousands of brown bears."
+		self.assertEqual(type(katmai.get_parkdescript()), type("yo"))
+		self.assertEqual(katmai.get_parkdescript(), park_desc)
 
 if __name__ == "__main__":
 	unittest.main(verbosity=2)
