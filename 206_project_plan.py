@@ -79,7 +79,7 @@ class Test_ParksData(unittest.TestCase):
 class Test_ArticlesData(unittest.TestCase):
 
 	def test1_ret_type_art(self):
-		self.assertEqual(type(get_articles_data()), type(["Chelsea FC, Premier League Champs"]))
+		self.assertEqual(type(get_articles_data()), type(["Chelsea FC, Premier League Champs"]), "This function should return a list!")
 
 	def test2_elem_type(self):
 		self.assertEqual(type(get_articles_data()[-1]), type(""), "Last element in returned value is not a str")

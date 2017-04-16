@@ -94,7 +94,7 @@ def get_parks_data():
 	else:
 		nattyparks_str_lst = []
 		for i in link_list:
-			print("Loop Counter")
+			#print("Loop Counter")
 			stripped_data = requests.get(i).text
 			soup_var2 = BeautifulSoup(stripped_data, "html.parser") 
 			column_grid = soup_var2.find("div", {"class" : "ColumnMain col-sm-12"}) #Nested HTML 
@@ -224,7 +224,8 @@ class NationalPark(object):
         'WA': 'Washington',
         'WI': 'Wisconsin',
         'WV': 'West Virginia',
-        'WY': 'Wyoming'}
+        'WY': 'Wyoming',
+        'Ha': "Hawaii"}
 
 	def __init__(self, html_string):
 
@@ -263,7 +264,7 @@ class NationalPark(object):
 	def get_faqs(self):
 		faqs = self.tup_links[-1][0]
 		faqs_url = "https://www.nps.gov" + faqs
-		return faqs
+		return faqs_url
 
 	def modify_state(self):
 		states_list = [self.states_dict[key] for key in self.states_dict.keys()]
@@ -283,38 +284,172 @@ class NationalPark(object):
 
 #class Article(object):
 
+
+
+
+
+
+
+
+
+
+
+
 # Write code to create a list of instances of the NationalPark class. 
 # This might be a good place to use a comprehension structure… and go through the data you saved about the national parks from your first function! 
 # You'll be able to use this list of instances when you load data into your database.
 
 # Ideally we want all the parks, but one park page has an error right now
-#print(html_parks_list[39])
-nationalpark_instance_list1 = [NationalPark(html_parks_list[i]) for i in range(39)]
 
+#I could not use list comprehension because I need to use the try/except code because there is a parks page that is inactive
+
+nationalpark_instance_list = []
+
+for html in html_parks_list:
+	try:
+		nationalpark_instance_list.append(NationalPark(html))
+		
+	except:
+		pass
+
+
+# nationalpark_instance_list = [NationalPark(html_parks_list[i]) for i in range(39)] #Inactive page index # 39
+# for j in range(40,654):
+# 	nationalpark_instance_list.append(NationalPark(html_parks_list[j]))
+#The National Park "South Carolina" DOES NOT HAVE A DESCRIPTION index # 515
+# for k in range (516, 654):
+# 	nationalpark_instance_list.append(NationalPark(html_parks_list[k]))
 # The 39th item is a page that is currently locked by the National Park Website, so we will do this instead:
 #nationalpark_instance_list2 = [NationalPark(html_parks_list[i]) for i in range(40,654)]
-
 #FOR NOW I AM COMMENTING THIS OUT TO AVOID SLOWING DOWN MY CODE, IT'S ANNOYING TO DEBUG
 # html_parks_list.pop(39)
 # nationalpark_instance_list = [NationalPark(x) for x in html_parks_list]
+
+
 
 # Write code to create a list of instances of the Article class.
 # The second function described above will be pretty useful here…
 # You'll be able to use these lists of instances when you load data into your database tables!
 #articles_instance_list = [Article]
 
+
+
+
+
+
+
+
+
+
+
+
 # Use requests / BeautifulSoup on this page: https://www.currentresults.com/Weather/US/average-annual-state-temperatures.php to gather each state's 
 # average temperature (in Fahrenheit OR Celsius as you prefer) and store them in a dictionary with  key:value pairs that represent states as keys and 
 # average-temps as their associated values
 
+
+
+
+
+
+# CREATE A DATABASE FOR THIS PROJECT
+
+conn = sqlite3.connect("finalproject_database.db")
+cur = conn.cursor()
+
+
 # A Parks table (for parks and monuments) containing information specific to each park like name, a reference to the States table, a description, and/or 
 # anything else you find interesting that is specific to each park/monument/site...
+
+cur.execute('DROP TABLE IF EXISTS Parks')
+table_spec1 = 'CREATE TABLE IF NOT EXISTS Parks (Name TEXT PRIMARY KEY, Description TEXT, State TEXT, Basic Info TEXT, FAQs TEXT)'
+cur.execute(table_spec1)
+
+
+tuple_db_list =[] #Initialize a list for the tuples to insert into DB
+
+for instance in nationalpark_instance_list:
+	#Now use the useful methods from the National Park Class to get each Park's specifics
+	try:
+		name = instance.name
+		#print(name)
+		desc = instance.get_parkdescript()
+		#print(desc)
+		instance.modify_state()
+		state = instance.states
+		#print(state)
+		basic_info = instance.get_basicinfo()
+		#print(basic_info)
+		faqs = instance.get_faqs()
+		#print(faqs)
+
+		tuple_db = (name, desc, state, basic_info, faqs)
+
+		tuple_db_list.append(tuple_db)
+	
+	except:
+		pass
+
+sql_parks = "INSERT OR IGNORE INTO Parks VALUES (?,?,?,?,?)" #Keeping IGNORE from Project 3 just in case
+
+for insert in tuple_db_list:
+	cur.execute(sql_parks, insert)
+
+conn.commit() #Commit Changes
+
 
 # A States table with info about each state, like name, abbrv, avg temp… 
 # (note that if a park is in multiple states and has a location like "AL,AR,GA,IL,KY,MO,NC,OK,TN", you have to decide how to handle this relationship. 
 # This is the sort of thing you describe your choice about in your readme! "I decided to use just the first state listed in the list of states for any 
 # park in multiple states for the relationship to the states table…")
 
+
+
+
+
+
+
+
+
+
+# An Articles table with info about each article from the front page of the NPS website, e.g. the article title and the text of the article 
+# (HINT: the text of the article is a string, and you can always find out if smaller strings are inside larger strings… say, if you wanted to find out 
+# 	which parks were mentioned in an article…)
+
+
+
+
+
+
+
+
+
+
+
+# Load data into your database tables!
+# Your list of NationalPark instances, list of Article instances, and the dictionary with states and their average temperatures you created earlier in 
+# your program are likely to be very useful here…
+# Consider: you could have a method in each class, NationalPark and Article, that generates a tuple of the information you'll want to load into one row 
+# in a database table..!
+
+
+
+
+
+# Use some of the tools/skills you've learned to make queries and process your data to produce some output. 
+
+
+
+
+
+
+
+
+
+
+
+
+conn.close()
 
 # Put your tests here, with any edits you now need from when you turned them in with your project plan.
 class Test_Initial_Caching(unittest.TestCase):
@@ -430,10 +565,13 @@ class Test_NatParks_Class(unittest.TestCase):
 		self.assertEqual(type(birmingham_crp.get_parkdescript()), type("blah"))
 		# self.assertEqual(birmingham_crp.get_parkdescript(), park_desc2) #apparently the strings are too long for the tests, so I had to comment it out
 
-class Test_ExtraVariables(unittest.TestCase):
+# class Test_ExtraVariables(unittest.TestCase):
 	
-	def test1_htmlnatlparklist(self):
-		self.assertEqual(len(get_parks_data()), 654)
+# 	def test1_htmlnatlparklist(self):
+# 		self.assertEqual(len(get_parks_data()), 654)
+
+
+
 
 if __name__ == "__main__":
 	unittest.main(verbosity=2)
