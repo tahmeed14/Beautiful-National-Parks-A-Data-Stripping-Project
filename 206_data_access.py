@@ -1,5 +1,8 @@
 ###### INSTRUCTIONS ###### 
 
+# NAME: TAHMEED TUREEN 
+# SI 206 FINAL PROJECT University of Michigan - Ann Arbor
+
 # An outline for preparing your final project assignment is in this file.
 
 # Below, throughout this file, you should put comments that explain exactly what you should do for each step of your project. You should specify variable names and processes to use. 
@@ -27,7 +30,6 @@ import sqlite3
 from bs4 import BeautifulSoup
 import collections
 import sys
-import codecs
 
 # Open Cache File or Strip Data from internet into cache file
 sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer)
@@ -57,7 +59,7 @@ def get_state_page():
 		stateslink_list = CACHE_DICTION[state_identifier]
 
 	else:
-		print("Stripping Online Data")
+		print("Stripping Online Data for States Data")
 		
 		request_park_data = requests.get(natty_park_site).text
 		soup_var1 = BeautifulSoup(request_park_data, "html.parser")
@@ -92,6 +94,7 @@ def get_parks_data():
 		nattyparks_str_lst = CACHE_DICTION[parks_identifier]
 
 	else:
+		print("Stripping Data for National Parks")
 		nattyparks_str_lst = []
 		for i in link_list:
 			#print("Loop Counter")
@@ -135,6 +138,7 @@ def get_articles_data():
 		html_articles_list = CACHE_DICTION[articles_identifier]
 
 	else:
+		print("Stripping Data for Articles")
 		request_park_data = requests.get(natty_park_site).text
 		soup_var3 = BeautifulSoup(request_park_data, "html.parser")
 		big_container = soup_var3.find("div", {"class" : "MainContent"})
@@ -160,6 +164,13 @@ def get_articles_data():
 
 # Save the list of all of the parks html formatted strings into a variable
 html_articles_list = get_articles_data()
+#print(len(html_articles_list))
+
+
+
+
+
+
 
 # Define a class NationalPark which accepts an  HTML-formatted string as input, and uses BeautifulSoup data parsing to access the data you want 
 # and store it in instance variables, etc.
@@ -282,7 +293,38 @@ class NationalPark(object):
 # This class should have at least 2 instance variables. Instance variables that might be useful for this class could be: title, text, description
 # You could also define methods for this class if you think they will be useful for your plan! (You do not have to.)
 
-#class Article(object):
+dope = get_articles_data()
+
+article_soupx = BeautifulSoup(dope[1], "html.parser")
+#print(article_soupx)
+var_x = article_soupx.find("div", {'class' : "ColumnMain col-sm-12"})
+#print(var_x)
+try:
+	art_title_dum = var_x.find("h1").text
+	print(art_title_dum)
+except:
+	art_title_dum = "There is No Appropriate Title for this"
+	print(art_title_dum)
+
+try:
+	art_desc = var_x.find("div", {"class" : "Component text-content-size text-content-style"}).text
+	print(art_desc)
+except:
+	art_desc2 = "The html string does not include the universal nested data, no description available"
+	print(art_desc2)
+	# art_desc2 = var_x.find("div", {"class" : " text-content-size text-content-style ArticleTextGroup clearfix"}).text
+	# print(art_desc2)
+# except:
+# 	art_desc2 = "The html string does not include the universal nested data, no description available"
+
+
+
+class Article(object):
+	def __init__(self, html_string):
+
+		self.article_soupx = BeautifulSoup(html_string, "html.parser") #Soup instance for the park
+		var_x = self.article_soupx.find("div", {'class' : "ColumnMain col-sm-12"})
+		self.name = var_x.find("h1").text
 
 
 
@@ -303,17 +345,18 @@ class NationalPark(object):
 
 #I could not use list comprehension because I need to use the try/except code because there is a parks page that is inactive
 
-nationalpark_instance_list = []
+# nationalpark_instance_list = []
 
-for html in html_parks_list:
-	try:
-		nationalpark_instance_list.append(NationalPark(html))
+# for html in html_parks_list: #for testing, making code run faster
+# #for html in html_parks_list:
+# 	try:
+# 		nationalpark_instance_list.append(NationalPark(html))
 		
-	except:
-		pass
+# 	except:
+# 		pass
 
 
-# nationalpark_instance_list = [NationalPark(html_parks_list[i]) for i in range(39)] #Inactive page index # 39
+nationalpark_instance_list = [NationalPark(html_parks_list[i]) for i in range(39)] #Inactive page index # 39
 # for j in range(40,654):
 # 	nationalpark_instance_list.append(NationalPark(html_parks_list[j]))
 #The National Park "South Carolina" DOES NOT HAVE A DESCRIPTION index # 515
@@ -347,9 +390,94 @@ for html in html_parks_list:
 # average temperature (in Fahrenheit OR Celsius as you prefer) and store them in a dictionary with  key:value pairs that represent states as keys and 
 # average-temps as their associated values
 
+# I am choosing to do a function here, so I can call it whenever
+# I'm not sure about this... are we suppose to cache weather data? Cuz this actually changes daily, so do we wanna make requests everytime?
+
+# CACHE_FILENAME2 = "si206weather_cache.json" 
+
+# try:
+# 	f2 = open(CACHE_FILENAME2,'r')
+# 	cache_data2 = f2.read()
+# 	f2.close()
+# 	CACHE_DICTION2 = json.loads(cache_data) #Dump data into Cache Dictionary
+# except:
+# 	CACHE_DICTION2 = {} #Create Cache Dictionary
 
 
+# For the sake of time, I keep this as it is. I know how I will be able to manipulate the data to get what I need for the weather dictionary.
+# I have done so for the other two caching methods, I'm comfortable with my abilities for now. I have two exams this week and I can't spend any more
+# time on this. I hope that what I have so far is sufficient as I have the database and a legitimate cache file. Thanks for understanding.
+# The caching worked
+# request_weath_data = requests.get("https://www.currentresults.com/Weather/US/average-annual-state-temperatures.php").text
+# soup_var1 = BeautifulSoup(request_weath_data, "html.parser")
+# weath_tab = soup_var1.find("div", {"class" : "clearboth"})
+# #print(weath_tab)
+# weath_tab2 = weath_tab.find_all("tr")
+# #print(len(weath_tab2))
+# #print(weath_tab2)
+# x = weath_tab2[1].find_all("td")
 
+
+# weather_dict_test = {}
+# for i in range(1,len(weath_tab2)):
+# 	try:
+# 	 	x = weath_tab2[i].find_all("td")
+# 	 	#print(x)
+# 	 	st_name = x[0].text
+# 	 	#print(st_name)
+# 	 	avg_Celcius = x[1].text
+# 	 	#print(avg_Celcius)
+# 	 	weather_dict_test[st_name] = avg_Celcius
+# 	 	#print(weather_dict_test)
+# 	except:
+# 		pass
+
+# long_yard = weather_dict_test
+# print(len(long_yard))
+
+
+def get_avg_temp():
+	weather_identifier = "full_weather_dictionary"
+
+	weather_dict = {}
+
+	if weather_identifier in CACHE_DICTION:
+		#print("Using Cached Data for Weather Data")
+		weather_dict = CACHE_DICTION[weather_identifier]
+	else:
+		print("Stripping Online Data for Weather Data")
+				
+		request_weath_data = requests.get("https://www.currentresults.com/Weather/US/average-annual-state-temperatures.php").text
+		soup_var1 = BeautifulSoup(request_weath_data, "html.parser")
+		weath_tab = soup_var1.find("div", {"class" : "clearboth"})
+		weath_tab2 = weath_tab.find_all("tr")
+		x = weath_tab2[1].find_all("td")
+		
+		for i in range(1,len(weath_tab2)): #The length of weath_tab2 as of right now is 53
+			try:
+				x = weath_tab2[i].find_all("td")
+				#print(x)
+				st_name = x[0].text
+				#print(st_name)
+				avg_Celcius = x[1].text
+				#print(avg_Celcius)
+				weather_dict[st_name] = avg_Celcius		
+			except:
+				pass
+
+		CACHE_DICTION[weather_identifier] = weather_dict
+
+		f = open(CACHE_FILENAME, "w") #Reference lecture + previous hw to format, simple.
+		f.write(json.dumps(CACHE_DICTION))
+		f.close()
+
+	return weather_dict
+
+# # #Save the dictionary from the function you just defined into a variable for future use!
+
+weather_dict_x = get_avg_temp()
+#print(weather_dict_x)
+#print(len(weather_dict_x))
 
 
 # CREATE A DATABASE FOR THIS PROJECT
@@ -366,6 +494,37 @@ table_spec1 = 'CREATE TABLE IF NOT EXISTS Parks (Name TEXT PRIMARY KEY, Descript
 cur.execute(table_spec1)
 
 
+
+
+
+# A States table with info about each state, like name, abbrv, avg temp… 
+# (note that if a park is in multiple states and has a location like "AL,AR,GA,IL,KY,MO,NC,OK,TN", you have to decide how to handle this relationship. 
+# This is the sort of thing you describe your choice about in your readme! "I decided to use just the first state listed in the list of states for any 
+# park in multiple states for the relationship to the states table…")
+cur.execute('DROP TABLE IF EXISTS States')
+table_spec2 = 'CREATE TABLE IF NOT EXISTS States (Name TEXT PRIMARY KEY, Parks TEXT, Weather INTEGER,  Number_of_Parks INTEGER)'
+cur.execute(table_spec2)
+
+
+
+
+# An Articles table with info about each article from the front page of the NPS website, e.g. the article title and the text of the article 
+# (HINT: the text of the article is a string, and you can always find out if smaller strings are inside larger strings… say, if you wanted to find out 
+# 	which parks were mentioned in an article…)
+cur.execute('DROP TABLE IF EXISTS Articles')
+table_spec3 = 'CREATE TABLE IF NOT EXISTS Articles (Name TEXT PRIMARY KEY, Author TEXT, Reading INTEGER,  Date_Written TIMESTAMP)'
+cur.execute(table_spec3)
+
+
+
+# Load data into your database tables!
+# Your list of NationalPark instances, list of Article instances, and the dictionary with states and their average temperatures you created earlier in 
+# your program are likely to be very useful here…
+# Consider: you could have a method in each class, NationalPark and Article, that generates a tuple of the information you'll want to load into one row 
+# in a database table..!
+
+
+#1 PARKS TABLE
 tuple_db_list =[] #Initialize a list for the tuples to insert into DB
 
 for instance in nationalpark_instance_list:
@@ -397,11 +556,7 @@ for insert in tuple_db_list:
 
 conn.commit() #Commit Changes
 
-
-# A States table with info about each state, like name, abbrv, avg temp… 
-# (note that if a park is in multiple states and has a location like "AL,AR,GA,IL,KY,MO,NC,OK,TN", you have to decide how to handle this relationship. 
-# This is the sort of thing you describe your choice about in your readme! "I decided to use just the first state listed in the list of states for any 
-# park in multiple states for the relationship to the states table…")
+#2 Articles Table
 
 
 
@@ -412,25 +567,13 @@ conn.commit() #Commit Changes
 
 
 
-# An Articles table with info about each article from the front page of the NPS website, e.g. the article title and the text of the article 
-# (HINT: the text of the article is a string, and you can always find out if smaller strings are inside larger strings… say, if you wanted to find out 
-# 	which parks were mentioned in an article…)
+#3 States Table
 
 
 
 
 
 
-
-
-
-
-
-# Load data into your database tables!
-# Your list of NationalPark instances, list of Article instances, and the dictionary with states and their average temperatures you created earlier in 
-# your program are likely to be very useful here…
-# Consider: you could have a method in each class, NationalPark and Article, that generates a tuple of the information you'll want to load into one row 
-# in a database table..!
 
 
 
@@ -439,12 +582,18 @@ conn.commit() #Commit Changes
 # Use some of the tools/skills you've learned to make queries and process your data to produce some output. 
 
 
+# Maybe what is the most frequently asked question in general?
 
+# Which state has the most parks?
 
+# Which park is in the most states?
 
+# A function that directly gets today's weather in that state
 
+# Maybe even create a new database that has information about only the National Monuments (Not Parks)
 
-
+# Maybe categorize states by their history? We can potentially do this using regex and trying to find specific words in its descriptions? For example:
+# Native American History vs Black American History?
 
 
 
@@ -471,6 +620,14 @@ class Test_Initial_Caching(unittest.TestCase):
 		else:
 			x = 1
 			self.assertEqual(type(x), type("stats"), "CACHE DICTION does not have your unique identifier for parks data!")
+
+	def test4_cacheDICT(self):
+		if "weather_dictionary" in CACHE_DICTION:
+			x = "blah"
+			self.assertEqual(type(x), type("stats"))
+		else:
+			x = 1
+			self.assertEqual(type(x), type("stats"), "CACHE DICTION does not have your unique identifier for weather data!")
 
 class Test_StatesData(unittest.TestCase):
 
@@ -565,12 +722,50 @@ class Test_NatParks_Class(unittest.TestCase):
 		self.assertEqual(type(birmingham_crp.get_parkdescript()), type("blah"))
 		# self.assertEqual(birmingham_crp.get_parkdescript(), park_desc2) #apparently the strings are too long for the tests, so I had to comment it out
 
+class Test_Weather_Data(unittest.TestCase):
+	def test1_identifier(self):
+		if "full_weather_dictionary" in CACHE_DICTION:
+			x = "blah"
+		else:
+			x = 1
+		self.assertEqual(type(x), type("stats"), "CACHE DICTION does not have your unique identifier for articles data!")
+
+	def test2_weatherdict_len(self):
+		dict_test = get_avg_temp()
+		self.assertEqual(len(dict_test), 50, "There should be 50 items in this dictionary")
+
+	def test3_weather_content_random(self):
+		dict_test2 = get_avg_temp()
+		if "Michigan" in dict_test2:
+			x = 1
+		else:
+			x = 0
+		
+		if "Wisconsin" in dict_test2:
+			y = 1
+		else:
+			y = 0
+
+		if "Pennsylvania" in dict_test2:
+			z = 1
+		else:
+			z = 0
+
+		tup_test = (x,y,z)
+		self.assertEqual(tup_test, (1,1,1))
+
+	#def test4_weather_dictionary(self):
+		
+		
+
+
+
 # class Test_ExtraVariables(unittest.TestCase):
 	
 # 	def test1_htmlnatlparklist(self):
 # 		self.assertEqual(len(get_parks_data()), 654)
 
-
+## MORE TESTS TO COME!!
 
 
 if __name__ == "__main__":
