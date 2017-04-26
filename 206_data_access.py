@@ -179,6 +179,7 @@ html_articles_list = get_articles_data()
 
 class NationalPark(object):
 	# Class variables
+	# The following dictionary was taken from http://code.activestate.com/recipes/577305-python-dictionary-of-us-states-and-territories/
 	states_dict = {'AK': 'Alaska', 'AL': 'Alabama', 'AR': 'Arkansas',
         'AS': 'American Samoa',
         'AZ': 'Arizona',
@@ -498,6 +499,7 @@ conn.commit() #Commit Changes
 
 #3 States Table
 
+# The following dictionary was taken from https://gist.github.com/rogerallen/1583593
 us_state_abbrev = {
     'Alabama': 'AL',
     'Alaska': 'AK',
