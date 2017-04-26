@@ -582,6 +582,8 @@ for insert in tuple_db_list3:
 conn.commit()
 
 
+
+
 # Use some of the tools/skills you've learned to make queries and process your data to produce some output. 
 
 # Use queries to find all the parks that have an avg weather of 60+ degree Celcius
@@ -606,6 +608,9 @@ for j in high_weath_parklist:
 print("\nThus, there are a total of " + str(len(high_weath_parklist)) + " parks/monuments with 60+ degree celcius weather currently")
 
 
+
+
+##Concept and Idea taken from my own project 3
 # Use queries to find all the descriptions of the articles and check whether or not the article mentions any parks I personally find interesting
 query_article_desc = "SELECT Description FROM Articles"
 cur.execute(query_article_desc)
@@ -627,9 +632,13 @@ for park in interesting_parks:
 		print("\nNone of the articles mention " + str(park))
 
 
+
+
 # Find the most common word that was used in the articles that were stripped from the National Parks website:
 
 print("\n\n*****Data Processing #3*****")
+##Concept and Idea taken from my own project 3
+
 count_var = collections.Counter() #Counter will break any ties!!!
 
 for line in art_desc_list: #for each desc in our list
@@ -646,6 +655,7 @@ for w in common_english_words:
 
 #print(count_var)
 
+#Same concept as project 3, but here for words and not just characters!
 common_tup = count_var.most_common(1)
 #print(common_tup)
 
@@ -658,6 +668,9 @@ most_common_word = sort_2nd[0][0]
 print("\nThe most common word in the articles descriptions is " + str(most_common_word) + " with a frequency of " + str(sort_2nd[0][1]))
 
 
+
+
+
 # Make a query to get the descriptions of all the parks and we will once again find the most commonly used words in all of the descriptions
 query_park_desc = "SELECT Description FROM Parks"
 cur.execute(query_park_desc)
@@ -668,6 +681,7 @@ park_desc_list = [tup[0] for tup in park_desc_tup]
 
 count_var2 = collections.Counter() #Counter will break any ties!!!
 
+#Same concept as project 3, but here for words and not just characters!
 for line in park_desc_list: #for each desc in our list
 	for word in line.split(): #for each word in line
 		count_var2[word] += 1
@@ -678,16 +692,16 @@ for w in common_english_words:
 
 #print(count_var2)
 
-
-# #common_tup = [('z',30), ('a',30), ('b', 30)]
 common_tup2 = count_var2.most_common(1)
-#print(common_tup)
+
 
 sort_first2 = sorted(common_tup2, key = lambda var: var[0])
 sort_2nd2 = sorted(sort_first2, key = lambda var: var[1], reverse = True)
 most_common_word2 = sort_2nd2[0][0]
 print("\n*****Data Processing #4*****")
 print("\nThe most common word in all of the parks descriptions is " + str(most_common_word2) + " with a frequency of " + str(sort_2nd2[0][1]))
+
+
 
 
 
@@ -719,6 +733,7 @@ dummy_tup = parks_counter.most_common(1)
 print("\nThus, the state with the most parks is " + str(dummy_tup[0][0]) + " with a frequency of " + str(dummy_tup[0][1]))
 
 conn.close()
+
 
 
 # Put your tests here, with any edits you now need from when you turned them in with your project plan.
