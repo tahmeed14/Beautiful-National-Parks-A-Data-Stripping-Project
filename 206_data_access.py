@@ -295,23 +295,23 @@ class NationalPark(object):
 
 dope = get_articles_data()
 
-article_soupx = BeautifulSoup(dope[1], "html.parser")
-#print(article_soupx)
-var_x = article_soupx.find("div", {'class' : "ColumnMain col-sm-12"})
-#print(var_x)
-try:
-	art_title_dum = var_x.find("h1").text
-	print(art_title_dum)
-except:
-	art_title_dum = "There is No Appropriate Title for this"
-	print(art_title_dum)
+# article_soupx = BeautifulSoup(dope[0], "html.parser")
+# #print(article_soupx)
+# var_x = article_soupx.find("div", {'class' : "ColumnMain col-sm-12"})
+# #print(var_x)
+# try:
+# 	art_title_dum = var_x.find("h1").text
+# 	print(art_title_dum)
+# except:
+# 	art_title_dum = "There is No Appropriate Title for this"
+# 	print(art_title_dum)
 
-try:
-	art_desc = var_x.find("div", {"class" : "Component text-content-size text-content-style"}).text
-	print(art_desc)
-except:
-	art_desc2 = "The html string does not include the universal nested data, no description available"
-	print(art_desc2)
+# try:
+# 	art_desc = var_x.find("div", {"class" : "text-content-size"}).text
+# 	print(art_desc)
+# except:
+# 	art_desc2 = "The html string does not include the universal nested data, no description available"
+# 	print(art_desc2)
 	# art_desc2 = var_x.find("div", {"class" : " text-content-size text-content-style ArticleTextGroup clearfix"}).text
 	# print(art_desc2)
 # except:
@@ -324,11 +324,21 @@ class Article(object):
 
 		self.article_soupx = BeautifulSoup(html_string, "html.parser") #Soup instance for the park
 		var_x = self.article_soupx.find("div", {'class' : "ColumnMain col-sm-12"})
-		self.name = var_x.find("h1").text
+		try:
+			self.name = var_x.find("h1").text
+		except:
+			self.name = "TITLE IS N/A due to Unique HTML Nest" #I have several cached files I have tested my code with and some articles, just do not have nice headers to strip the title.
 
+		try:
+			self.text = var_x.find("div", {"class" : "text-content-size"}).text
+			#print(self.text)
+		except:
+			self.text = "Description N/A due to Unique HTML Nest"
+			#print(self.text)
 
-
-
+x = Article(dope[0])
+print(x.name)
+print(x.text)
 
 
 
