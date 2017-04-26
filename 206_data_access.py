@@ -596,7 +596,8 @@ high_weath_assoclist = [tup[1] for tup in parks_highweath]
 
 print("************** Printing Processed Data Output **************")
 print("\n\n\n")
-print("The following parks have an average weather greater than 60 degrees celcius currently")
+print("Data Processing #1")
+print("\nThe following parks have an average weather greater than 60 degrees celcius currently")
 number = 0
 for j in high_weath_parklist:
 	number += 1
@@ -604,16 +605,25 @@ for j in high_weath_parklist:
 print("\nThus, there are a total of " + str(len(high_weath_parklist)) + " parks/monuments with 60+ degree celcius weather currently")
 
 
-# Which state has the most parks?
+# Use queries to find all the descriptions of the articles and check whether or not the article mentions any parks I personally find interesting
+query_article_desc = "SELECT Description FROM Articles"
+cur.execute(query_article_desc)
+art_desc_tup = cur.fetchall()
 
-# Which park is in the most states?
+art_desc_list = [tup[0] for tup in art_desc_tup]
+#print(art_desc_list)
 
-# A function that directly gets today's weather in that state
+art_desc_words = {word for line in art_desc_list for word in line.split()} #Code concept used from project 3
 
-# Maybe even create a new database that has information about only the National Monuments (Not Parks)
+print(art_desc_words)
 
-# Maybe categorize states by their history? We can potentially do this using regex and trying to find specific words in its descriptions? For example:
-# Native American History vs Black American History?
+interesting_parks = ["Katmai", "Pullman", "Keweenaw", "Appalachian", "Saratoga", "Pipestone", "Yellowstone", "Christiansted"]
+print("\nData Processing #2")
+for park in interesting_parks:
+	if park in art_desc_words:
+		print("\nThe articles mention " + str(park))
+	else:
+		print("\nNone of the articles mention " + str(park))
 
 
 
