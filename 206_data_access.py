@@ -691,6 +691,16 @@ print("\nThe most common word in the articles descriptions is " + str(most_commo
 
 
 
+# Make an INNER JOIN query to get data from the States table and the Parks table and connect the States with their respective parks. Then use specific
+# Python skills to get the top five states with the most parks in the database.
+
+query_parkcount = "SELECT States.Name, Parks.Name from States INNER JOIN Parks ON instr(Parks.State, States.Name)"
+cur.execute(query_parkcount)
+parks_count = cur.fetchall()
+
+print(parks_count)
+
+
 conn.close()
 
 
@@ -716,7 +726,7 @@ class Test_Initial_Caching(unittest.TestCase):
 			self.assertEqual(type(x), type("stats"), "CACHE DICTION does not have your unique identifier for parks data!")
 
 	def test4_cacheDICT(self):
-		if "weather_dictionary" in CACHE_DICTION:
+		if "full_weather_dictionary" in CACHE_DICTION:
 			x = "blah"
 			self.assertEqual(type(x), type("stats"))
 		else:
