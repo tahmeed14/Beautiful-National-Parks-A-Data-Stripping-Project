@@ -295,30 +295,6 @@ class NationalPark(object):
 
 dope = get_articles_data()
 
-# article_soupx = BeautifulSoup(dope[0], "html.parser")
-# #print(article_soupx)
-# var_x = article_soupx.find("div", {'class' : "ColumnMain col-sm-12"})
-# #print(var_x)
-# try:
-# 	art_title_dum = var_x.find("h1").text
-# 	print(art_title_dum)
-# except:
-# 	art_title_dum = "There is No Appropriate Title for this"
-# 	print(art_title_dum)
-
-# try:
-# 	art_desc = var_x.find("div", {"class" : "text-content-size"}).text
-# 	print(art_desc)
-# except:
-# 	art_desc2 = "The html string does not include the universal nested data, no description available"
-# 	print(art_desc2)
-	# art_desc2 = var_x.find("div", {"class" : " text-content-size text-content-style ArticleTextGroup clearfix"}).text
-	# print(art_desc2)
-# except:
-# 	art_desc2 = "The html string does not include the universal nested data, no description available"
-
-
-
 class Article(object):
 	def __init__(self, html_string):
 
@@ -336,11 +312,13 @@ class Article(object):
 			self.text = "Description N/A due to Unique HTML Nest"
 			#print(self.text)
 
+	def __str__(self):
+		return "The title of the article is ''{}'' and the description is: {}".format(self.name, self.text)
+
 x = Article(dope[0])
 print(x.name)
 print(x.text)
-
-
+print(x)
 
 
 
