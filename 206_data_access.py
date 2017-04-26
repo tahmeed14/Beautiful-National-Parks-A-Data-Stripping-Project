@@ -251,6 +251,7 @@ class NationalPark(object):
 		plan_visit_div2 = plan_visit_div.find("li", {"class" : "has-sub"})
 		plan_visit_a = plan_visit_div2.find_all("a")
 		self.tup_links = [(a["href"], a.text) for a in plan_visit_a]
+		#print(self.tup_links)
 
 
 	def __str__(self):
@@ -296,7 +297,7 @@ class NationalPark(object):
 class Article(object):
 	def __init__(self, html_string):
 
-		self.article_soupx = BeautifulSoup(html_string, "html.parser") #Soup instance for the park
+		self.article_soupx = BeautifulSoup(html_string, "html.parser") #Soup instance for the article
 		var_x = self.article_soupx.find("div", {'class' : "ColumnMain col-sm-12"})
 		try:
 			self.name = var_x.find("h1").text
@@ -404,7 +405,7 @@ cur = conn.cursor()
 # anything else you find interesting that is specific to each park/monument/site...
 
 cur.execute('DROP TABLE IF EXISTS Parks')
-table_spec1 = 'CREATE TABLE IF NOT EXISTS Parks (Name TEXT PRIMARY KEY, Description TEXT, State TEXT, Basic Info TEXT, FAQs TEXT)'
+table_spec1 = 'CREATE TABLE IF NOT EXISTS Parks (Name TEXT PRIMARY KEY, Description TEXT, State TEXT, PlanVisit TEXT, BasicInfo TEXT, FAQsMISC TEXT)'
 cur.execute(table_spec1)
 
 
@@ -451,19 +452,21 @@ for instance in nationalpark_instance_list:
 		instance.modify_state()
 		state = instance.states
 		#print(state)
+		plan_page = instance.get_planpage()
+		#print(plan_page)
 		basic_info = instance.get_basicinfo()
 		#print(basic_info)
 		faqs = instance.get_faqs()
 		#print(faqs)
 
-		tuple_db = (name, desc, state, basic_info, faqs) #create a tuple, so that we can easily implement our desired info into our sq database
+		tuple_db = (name, desc, state, plan_page, basic_info, faqs) #create a tuple, so that we can easily implement our desired info into our sq database
 
 		tuple_db_list.append(tuple_db)
 	
 	except:
 		pass
 
-sql_parks = "INSERT OR IGNORE INTO Parks VALUES (?,?,?,?,?)" #Keeping IGNORE from Project 3 just in case
+sql_parks = "INSERT OR IGNORE INTO Parks VALUES (?,?,?,?,?,?)" #Keeping IGNORE from Project 3 just in case
 
 for insert in tuple_db_list:
 	cur.execute(sql_parks, insert)
@@ -581,8 +584,25 @@ conn.commit()
 
 # Use some of the tools/skills you've learned to make queries and process your data to produce some output. 
 
+# Use queries to find all the parks that have an avg weather of 50+ degree Celcius
+query_parkweath = "SELECT Parks.Name, States.Weather from Parks INNER JOIN States ON instr(Parks.State, States.Name) WHERE (States.Weather > 50)"
 
-# Maybe what is the most frequently asked question in general?
+#Works for my database but not a new database I create after I deleted my original cache
+cur.execute(query_parkweath)
+parks_highweath = cur.fetchall()
+
+high_weath_parklist = [tup[0] for tup in parks_highweath]
+high_weath_assoclist = [tup[1] for tup in parks_highweath]
+
+print("************** Printing Processed Data Output **************")
+print("\n\n\n")
+print("The following parks have an average weather greater than 60 degrees celcius currently")
+number = 0
+for j in high_weath_parklist:
+	number += 1
+	print(str(number) + ")", j)
+print("\nThus, there are a total of " + str(len(high_weath_parklist)) + " parks/monuments with 60+ degree celcius weather currently")
+
 
 # Which state has the most parks?
 
@@ -773,8 +793,31 @@ class Test_Weather_Data(unittest.TestCase):
 		self.assertEqual(tup_test, (1,1,1), "Some States are missing from your dictionary!")
 
 	#def test4_weather_dictionary(self):
-		
-		
+
+class Test_DataBase(unittest.TestCase):	
+	def test1_parksdb(self):
+		conn = sqlite3.connect('finalproject_database.db')
+		cur = conn.cursor()
+		cur.execute('SELECT * FROM Parks');
+		allparks = cur.fetchall()
+		self.assertTrue(len(allparks)>= 30, "Testing there are at least 30 parks in the Parks data table")
+		conn.close()		
+
+	def test2_articlesdb(self):
+		conn = sqlite3.connect('finalproject_database.db')
+		cur = conn.cursor()
+		cur.execute('SELECT * FROM Articles');
+		all_arts = cur.fetchall()
+		self.assertTrue(len(all_arts) == 2, "Testing there are exactly 2 articles in the Articles table")
+		conn.close()
+
+	def test3_statesdb(self):
+		conn = sqlite3.connect('finalproject_database.db')
+		cur = conn.cursor()
+		cur.execute('SELECT * FROM States');
+		allstates = cur.fetchall()
+		self.assertTrue(len(allstates) == 50, "Testing there are exactly 50 sttates in the States data table")
+		conn.close()
 
 
 
