@@ -584,15 +584,16 @@ conn.commit()
 
 # Use some of the tools/skills you've learned to make queries and process your data to produce some output. 
 
-# Use queries to find all the parks that have an avg weather of 50+ degree Celcius
-query_parkweath = "SELECT Parks.Name, States.Weather from Parks INNER JOIN States ON instr(Parks.State, States.Name) WHERE (States.Weather > 50)"
+# Use queries to find all the parks that have an avg weather of 60+ degree Celcius
+query_parkweath = "SELECT Parks.Name, States.Weather from Parks INNER JOIN States ON instr(Parks.State, States.Name) WHERE (States.Weather > 60)"
 
-#Works for my database but not a new database I create after I deleted my original cache
 cur.execute(query_parkweath)
 parks_highweath = cur.fetchall()
 
 high_weath_parklist = [tup[0] for tup in parks_highweath]
 high_weath_assoclist = [tup[1] for tup in parks_highweath]
+
+# Now print the summary of your findings in an organized and neatly fashion
 
 print("************** Printing Processed Data Output **************")
 print("\n\n\n")
@@ -615,10 +616,10 @@ art_desc_list = [tup[0] for tup in art_desc_tup]
 
 art_desc_words = {word for line in art_desc_list for word in line.split()} #Code concept used from project 3
 
-print(art_desc_words)
+#print(art_desc_words)
 
 interesting_parks = ["Katmai", "Pullman", "Keweenaw", "Appalachian", "Saratoga", "Pipestone", "Yellowstone", "Christiansted"]
-print("\nData Processing #2")
+print("\n\nData Processing #2")
 for park in interesting_parks:
 	if park in art_desc_words:
 		print("\nThe articles mention " + str(park))
@@ -626,9 +627,72 @@ for park in interesting_parks:
 		print("\nNone of the articles mention " + str(park))
 
 
+# Find the most common word that was used in the articles that were stripped from the National Parks website:
+
+print("\n\nData Processing #3")
+count_var = collections.Counter() #Counter will break any ties!!!
+
+for line in art_desc_list: #for each desc in our list
+	for word in line.split(): #for each word in line
+		count_var[word] += 1 #lower to compensate for not recounting capitalized and non capitalized letters
+
+#print(type(count_var))
+
+common_english_words = ["the", "a", "who", "that", "and", "of", "in", "by", "for", "at", "to", "are", "is", "The"] #This is not an exhaustive list, can be made longer based on user preference
+
+for w in common_english_words:
+	if w in count_var:
+		del count_var[w]
+
+#print(count_var)
+
+
+# #common_tup = [('z',30), ('a',30), ('b', 30)]
+common_tup = count_var.most_common(1)
+#print(common_tup)
+
+sort_first = sorted(common_tup, key = lambda var: var[0])
+sort_2nd = sorted(sort_first, key = lambda var: var[1], reverse = True)
+most_common_word = sort_2nd[0][0]
+
+print("\nThe most common word in the articles descriptions is " + str(most_common_word) + " with a frequency of " + str(sort_2nd[0][1]))
+
+
+# Make a query to get the descriptions of all the parks and we will once again find the most commonly used words in all of the descriptions
+query_park_desc = "SELECT Description FROM Parks"
+cur.execute(query_park_desc)
+park_desc_tup = cur.fetchall()
+
+park_desc_list = [tup[0] for tup in park_desc_tup]
+#print(art_desc_list)
+
+count_var2 = collections.Counter() #Counter will break any ties!!!
+
+for line in park_desc_list: #for each desc in our list
+	for word in line.split(): #for each word in line
+		count_var2[word] += 1
+
+for w in common_english_words:
+	if w in count_var2:
+		del count_var2[w]
+
+#print(count_var2)
+
+
+# #common_tup = [('z',30), ('a',30), ('b', 30)]
+common_tup2 = count_var2.most_common(1)
+#print(common_tup)
+
+sort_first2 = sorted(common_tup2, key = lambda var: var[0])
+sort_2nd2 = sorted(sort_first2, key = lambda var: var[1], reverse = True)
+most_common_word2 = sort_2nd2[0][0]
+print("\nData Processing #4")
+print("\nThe most common word in the articles descriptions is " + str(most_common_word2) + " with a frequency of " + str(sort_2nd2[0][1]))
+
 
 
 conn.close()
+
 
 # Put your tests here, with any edits you now need from when you turned them in with your project plan.
 class Test_Initial_Caching(unittest.TestCase):
