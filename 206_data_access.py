@@ -597,7 +597,7 @@ high_weath_assoclist = [tup[1] for tup in parks_highweath]
 
 print("************** Printing Processed Data Output **************")
 print("\n\n\n")
-print("Data Processing #1")
+print("*****Data Processing #1*****")
 print("\nThe following parks have an average weather greater than 60 degrees celcius currently")
 number = 0
 for j in high_weath_parklist:
@@ -629,7 +629,7 @@ for park in interesting_parks:
 
 # Find the most common word that was used in the articles that were stripped from the National Parks website:
 
-print("\n\nData Processing #3")
+print("\n\n*****Data Processing #3*****")
 count_var = collections.Counter() #Counter will break any ties!!!
 
 for line in art_desc_list: #for each desc in our list
@@ -646,10 +646,10 @@ for w in common_english_words:
 
 #print(count_var)
 
-
-# #common_tup = [('z',30), ('a',30), ('b', 30)]
 common_tup = count_var.most_common(1)
 #print(common_tup)
+
+#Sort based on alphabets just in case there is a tie
 
 sort_first = sorted(common_tup, key = lambda var: var[0])
 sort_2nd = sorted(sort_first, key = lambda var: var[1], reverse = True)
@@ -686,8 +686,8 @@ common_tup2 = count_var2.most_common(1)
 sort_first2 = sorted(common_tup2, key = lambda var: var[0])
 sort_2nd2 = sorted(sort_first2, key = lambda var: var[1], reverse = True)
 most_common_word2 = sort_2nd2[0][0]
-print("\nData Processing #4")
-print("\nThe most common word in the articles descriptions is " + str(most_common_word2) + " with a frequency of " + str(sort_2nd2[0][1]))
+print("\n*****Data Processing #4*****")
+print("\nThe most common word in all of the parks descriptions is " + str(most_common_word2) + " with a frequency of " + str(sort_2nd2[0][1]))
 
 
 
@@ -698,8 +698,25 @@ query_parkcount = "SELECT States.Name, Parks.Name from States INNER JOIN Parks O
 cur.execute(query_parkcount)
 parks_count = cur.fetchall()
 
-print(parks_count)
+#print(parks_count)
 
+parks_count_list = [tup[0] for tup in parks_count] #normal list comprehension
+
+parks_counter = collections.Counter(parks_count_list) #using collections library counter
+
+ranked_dict = dict(parks_counter) #conver counter to dictionary for printing purposes
+
+print('\n*****Data Processing #5*****')
+print("\nThe following is a comprehensive dicitionary of the 50 U.S. and the number of parks which reside in the State")
+print("\nThis count is unique to the Database used and numbers may vary slightly from the National Parks website")
+
+print("\n")
+print(ranked_dict)
+
+dummy_tup = parks_counter.most_common(1)
+#print(dummy_tup[0][0])
+
+print("\nThus, the state with the most parks is " + str(dummy_tup[0][0]) + " with a frequency of " + str(dummy_tup[0][1]))
 
 conn.close()
 
