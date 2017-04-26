@@ -324,18 +324,18 @@ class Article(object):
 
 #I could not use list comprehension because I need to use the try/except code because there is a parks page that is inactive
 
-# nationalpark_instance_list = []
+nationalpark_instance_list = []
 
-# for html in html_parks_list: #for testing, making code run faster
-# #for html in html_parks_list:
-# 	try:
-# 		nationalpark_instance_list.append(NationalPark(html))
+for html in html_parks_list: #for testing, making code run faster
+#for html in html_parks_list:
+	try:
+		nationalpark_instance_list.append(NationalPark(html))
 		
-# 	except:
-# 		pass
+	except:
+		pass
 
 
-nationalpark_instance_list = [NationalPark(html_parks_list[i]) for i in range(39)] #Inactive page index # 39
+#nationalpark_instance_list = [NationalPark(html_parks_list[i]) for i in range(39)] #Inactive page index # 39
 
 
 
@@ -624,7 +624,7 @@ art_desc_words = {word for line in art_desc_list for word in line.split()} #Code
 #print(art_desc_words)
 
 interesting_parks = ["Katmai", "Pullman", "Keweenaw", "Appalachian", "Saratoga", "Pipestone", "Yellowstone", "Christiansted"]
-print("\n\nData Processing #2")
+print("\n\n*****Data Processing #2*****")
 for park in interesting_parks:
 	if park in art_desc_words:
 		print("\nThe articles mention " + str(park))
@@ -717,6 +717,7 @@ parks_count = cur.fetchall()
 parks_count_list = [tup[0] for tup in parks_count] #normal list comprehension
 
 parks_counter = collections.Counter(parks_count_list) #using collections library counter
+#print(parks_counter)
 
 ranked_dict = dict(parks_counter) #conver counter to dictionary for printing purposes
 
@@ -916,7 +917,7 @@ class Test_DataBase(unittest.TestCase):
 		cur = conn.cursor()
 		cur.execute('SELECT * FROM Parks');
 		allparks = cur.fetchall()
-		self.assertTrue(len(allparks)>= 30, "Testing there are at least 30 parks in the Parks data table")
+		self.assertTrue(len(allparks)>= 100, "Testing there are at least 30 parks in the Parks data table")
 		conn.close()		
 
 	def test2_articlesdb(self):
@@ -935,15 +936,39 @@ class Test_DataBase(unittest.TestCase):
 		self.assertTrue(len(allstates) == 50, "Testing there are exactly 50 sttates in the States data table")
 		conn.close()
 
-
-
-# class Test_ExtraVariables(unittest.TestCase):
+class Test_DataManipulation(unittest.TestCase):
 	
-# 	def test1_htmlnatlparklist(self):
-# 		self.assertEqual(len(get_parks_data()), 654)
+	def test1_process1(self):
+		self.assertEqual(type(parks_highweath[0]), type((1,"derp")), "The elements of this list must be a tuple")
+		self.assertEqual(type(parks_highweath[0][0]), type("Michigan"), "The first element in this list's tuple must be a str")
+		#self.assertEqual(type(parks_highweath[0][1]), type(1000.0), "The second element in this list's tuple must be a float type")
+	
+	#Tested using print statements
+	# def test2_process2(self):
+	# 	self.assertEqual(type(art_desc_words), <class 'set'>, "elements here must be strings")
 
-## MORE TESTS TO COME!!
+	def test3_process3(self):
+		self.assertEqual(type(common_tup[0]), type((1,"a")), "This variable must be a tuple")
+		self.assertEqual(type(common_tup[0]), type(("a",1)), "This variable must be a tuple")
+		self.assertEqual(type(most_common_word), type("yo"), "This variable must be a string")
+	
+	def test4_process4(self):
+		self.assertEqual(type(common_tup2[0]), type((1,"a")), "This variable must be a tuple")
+		self.assertEqual(type(common_tup2), type([]), "This variable must be a list")
+		self.assertEqual(type(most_common_word2), type("yo"), "This variable must be a string")
+	
+	def test5_process5(self):
+		self.assertEqual(type(parks_counter), type(collections.Counter()))
 
+	def test6_process5(self):
+		self.assertEqual(type(ranked_dict), type({}))
+
+	def test7_process5(self):
+		self.assertEqual(len(ranked_dict.keys()), 50, "There should be 50 keys here")
+
+	def test8_process5(self):
+		self.assertEqual(type(dummy_tup), type([]))
+		self.assertEqual(type(dummy_tup[0]), type(("1",1)))
 
 if __name__ == "__main__":
 	unittest.main(verbosity=2)
