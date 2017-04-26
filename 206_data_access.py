@@ -130,6 +130,9 @@ html_parks_list = get_parks_data()
 # Write a function to get and cache HTML data from each of the articles on the front page of the main NPS website. An example of an article can be found 
 # at https://home.nps.gov/ever/wilderness.htm -- which you get to by clicking on this displayed link on the front page of NPS.gov, for example:
 
+#*******This function will only get the first two articles from the Home Page, this is because initially when I first started to write my code,
+# the website had only two actual articles on the home page, now it has 5. Because it may vary, I chose to restrict it to 2.
+
 def get_articles_data():
 	articles_identifier = "articles_data"
 	natty_park_site = "https://www.nps.gov/index.htm"
@@ -165,11 +168,6 @@ def get_articles_data():
 # Save the list of all of the parks html formatted strings into a variable
 html_articles_list = get_articles_data()
 #print(len(html_articles_list))
-
-
-
-
-
 
 
 # Define a class NationalPark which accepts an  HTML-formatted string as input, and uses BeautifulSoup data parsing to access the data you want 
@@ -293,7 +291,6 @@ class NationalPark(object):
 # This class should have at least 2 instance variables. Instance variables that might be useful for this class could be: title, text, description
 # You could also define methods for this class if you think they will be useful for your plan! (You do not have to.)
 
-dope = get_articles_data()
 
 class Article(object):
 	def __init__(self, html_string):
@@ -314,14 +311,6 @@ class Article(object):
 
 	def __str__(self):
 		return "The title of the article is ''{}'' and the description is: {}".format(self.name, self.text)
-
-x = Article(dope[0])
-print(x.name)
-print(x.text)
-print(x)
-
-
-
 
 
 
@@ -345,32 +334,14 @@ print(x)
 
 
 nationalpark_instance_list = [NationalPark(html_parks_list[i]) for i in range(39)] #Inactive page index # 39
-# for j in range(40,654):
-# 	nationalpark_instance_list.append(NationalPark(html_parks_list[j]))
-#The National Park "South Carolina" DOES NOT HAVE A DESCRIPTION index # 515
-# for k in range (516, 654):
-# 	nationalpark_instance_list.append(NationalPark(html_parks_list[k]))
-# The 39th item is a page that is currently locked by the National Park Website, so we will do this instead:
-#nationalpark_instance_list2 = [NationalPark(html_parks_list[i]) for i in range(40,654)]
-#FOR NOW I AM COMMENTING THIS OUT TO AVOID SLOWING DOWN MY CODE, IT'S ANNOYING TO DEBUG
-# html_parks_list.pop(39)
-# nationalpark_instance_list = [NationalPark(x) for x in html_parks_list]
 
 
 
 # Write code to create a list of instances of the Article class.
 # The second function described above will be pretty useful here…
 # You'll be able to use these lists of instances when you load data into your database tables!
-#articles_instance_list = [Article]
 
-
-
-
-
-
-
-
-
+articles_instance_list = [Article(html_x) for html_x in html_articles_list]
 
 
 
@@ -378,54 +349,8 @@ nationalpark_instance_list = [NationalPark(html_parks_list[i]) for i in range(39
 # average temperature (in Fahrenheit OR Celsius as you prefer) and store them in a dictionary with  key:value pairs that represent states as keys and 
 # average-temps as their associated values
 
-# I am choosing to do a function here, so I can call it whenever
-# I'm not sure about this... are we suppose to cache weather data? Cuz this actually changes daily, so do we wanna make requests everytime?
-
-# CACHE_FILENAME2 = "si206weather_cache.json" 
-
-# try:
-# 	f2 = open(CACHE_FILENAME2,'r')
-# 	cache_data2 = f2.read()
-# 	f2.close()
-# 	CACHE_DICTION2 = json.loads(cache_data) #Dump data into Cache Dictionary
-# except:
-# 	CACHE_DICTION2 = {} #Create Cache Dictionary
-
-
-# For the sake of time, I keep this as it is. I know how I will be able to manipulate the data to get what I need for the weather dictionary.
-# I have done so for the other two caching methods, I'm comfortable with my abilities for now. I have two exams this week and I can't spend any more
-# time on this. I hope that what I have so far is sufficient as I have the database and a legitimate cache file. Thanks for understanding.
-# The caching worked
-# request_weath_data = requests.get("https://www.currentresults.com/Weather/US/average-annual-state-temperatures.php").text
-# soup_var1 = BeautifulSoup(request_weath_data, "html.parser")
-# weath_tab = soup_var1.find("div", {"class" : "clearboth"})
-# #print(weath_tab)
-# weath_tab2 = weath_tab.find_all("tr")
-# #print(len(weath_tab2))
-# #print(weath_tab2)
-# x = weath_tab2[1].find_all("td")
-
-
-# weather_dict_test = {}
-# for i in range(1,len(weath_tab2)):
-# 	try:
-# 	 	x = weath_tab2[i].find_all("td")
-# 	 	#print(x)
-# 	 	st_name = x[0].text
-# 	 	#print(st_name)
-# 	 	avg_Celcius = x[1].text
-# 	 	#print(avg_Celcius)
-# 	 	weather_dict_test[st_name] = avg_Celcius
-# 	 	#print(weather_dict_test)
-# 	except:
-# 		pass
-
-# long_yard = weather_dict_test
-# print(len(long_yard))
-
-
 def get_avg_temp():
-	weather_identifier = "full_weather_dictionary"
+	weather_identifier = "full_weather_dictionary" #unique identifier
 
 	weather_dict = {}
 
@@ -490,7 +415,7 @@ cur.execute(table_spec1)
 # This is the sort of thing you describe your choice about in your readme! "I decided to use just the first state listed in the list of states for any 
 # park in multiple states for the relationship to the states table…")
 cur.execute('DROP TABLE IF EXISTS States')
-table_spec2 = 'CREATE TABLE IF NOT EXISTS States (Name TEXT PRIMARY KEY, Parks TEXT, Weather INTEGER,  Number_of_Parks INTEGER)'
+table_spec2 = 'CREATE TABLE IF NOT EXISTS States (Name TEXT PRIMARY KEY, Abbreviation TEXT, Weather INTEGER)'
 cur.execute(table_spec2)
 
 
@@ -500,7 +425,7 @@ cur.execute(table_spec2)
 # (HINT: the text of the article is a string, and you can always find out if smaller strings are inside larger strings… say, if you wanted to find out 
 # 	which parks were mentioned in an article…)
 cur.execute('DROP TABLE IF EXISTS Articles')
-table_spec3 = 'CREATE TABLE IF NOT EXISTS Articles (Name TEXT PRIMARY KEY, Author TEXT, Reading INTEGER,  Date_Written TIMESTAMP)'
+table_spec3 = 'CREATE TABLE IF NOT EXISTS Articles (Name TEXT PRIMARY KEY, Description TEXT)'
 cur.execute(table_spec3)
 
 
@@ -530,7 +455,7 @@ for instance in nationalpark_instance_list:
 		faqs = instance.get_faqs()
 		#print(faqs)
 
-		tuple_db = (name, desc, state, basic_info, faqs)
+		tuple_db = (name, desc, state, basic_info, faqs) #create a tuple, so that we can easily implement our desired info into our sq database
 
 		tuple_db_list.append(tuple_db)
 	
@@ -546,25 +471,110 @@ conn.commit() #Commit Changes
 
 #2 Articles Table
 
+tuple_db_list2 =[] #Initialize a list for the tuples to insert into DB
 
+for instance in articles_instance_list:
+	#Now use the useful methods from the National Park Class to get each Park's specifics
+	try:
+		name = instance.name
+		#print(name)
+		desc = instance.text
+		#print(desc)
+		
+		tuple_db2 = (name, desc) #create a tuple, so that we can easily implement our desired info into our sq database
 
+		tuple_db_list2.append(tuple_db2)
+	
+	except:
+		pass
 
+sql_articles = "INSERT OR IGNORE INTO Articles VALUES (?,?)" #Keeping IGNORE from Project 3 just in case
 
+for insert in tuple_db_list2:
+	cur.execute(sql_articles, insert)
 
-
-
+conn.commit() #Commit Changes
 
 
 #3 States Table
 
+us_state_abbrev = {
+    'Alabama': 'AL',
+    'Alaska': 'AK',
+    'Arizona': 'AZ',
+    'Arkansas': 'AR',
+    'California': 'CA',
+    'Colorado': 'CO',
+    'Connecticut': 'CT',
+    'Delaware': 'DE',
+    'Florida': 'FL',
+    'Georgia': 'GA',
+    'Hawaii': 'HI',
+    'Idaho': 'ID',
+    'Illinois': 'IL',
+    'Indiana': 'IN',
+    'Iowa': 'IA',
+    'Kansas': 'KS',
+    'Kentucky': 'KY',
+    'Louisiana': 'LA',
+    'Maine': 'ME',
+    'Maryland': 'MD',
+    'Massachusetts': 'MA',
+    'Michigan': 'MI',
+    'Minnesota': 'MN',
+    'Mississippi': 'MS',
+    'Missouri': 'MO',
+    'Montana': 'MT',
+    'Nebraska': 'NE',
+    'Nevada': 'NV',
+    'New Hampshire': 'NH',
+    'New Jersey': 'NJ',
+    'New Mexico': 'NM',
+    'New York': 'NY',
+    'North Carolina': 'NC',
+    'North Dakota': 'ND',
+    'Ohio': 'OH',
+    'Oklahoma': 'OK',
+    'Oregon': 'OR',
+    'Pennsylvania': 'PA',
+    'Rhode Island': 'RI',
+    'South Carolina': 'SC',
+    'South Dakota': 'SD',
+    'Tennessee': 'TN',
+    'Texas': 'TX',
+    'Utah': 'UT',
+    'Vermont': 'VT',
+    'Virginia': 'VA',
+    'Washington': 'WA',
+    'West Virginia': 'WV',
+    'Wisconsin': 'WI',
+    'Wyoming': 'WY',
+}
+
+tuple_db_list3 = []
+
+for key in weather_dict_x.keys():
+	try:
+		state_name = key
+		#print(state_name)
+		weath_celcius = weather_dict_x[key]
+		#print(weath_celcius)
+		state_abv = us_state_abbrev[key]
+		#print(state_abv)
 
 
+		tuple_db3 = (state_name, state_abv, weath_celcius) #create a tuple, so that we can easily implement our desired info into our sq database
+		tuple_db_list3.append(tuple_db3)
 
+	except:
+		pass
 
+sql_states = "INSERT OR IGNORE INTO States VALUES (?,?,?)" #Keeping IGNORE from Project 3 just in case
 
+for insert in tuple_db_list3:
+	cur.execute(sql_states, insert)
 
-
-
+conn.commit()
 
 
 # Use some of the tools/skills you've learned to make queries and process your data to produce some output. 
@@ -710,6 +720,24 @@ class Test_NatParks_Class(unittest.TestCase):
 		self.assertEqual(type(birmingham_crp.get_parkdescript()), type("blah"))
 		# self.assertEqual(birmingham_crp.get_parkdescript(), park_desc2) #apparently the strings are too long for the tests, so I had to comment it out
 
+class Test_Article_Class(unittest.TestCase):
+
+	def test_typename(self):
+		first_elem = Article(get_articles_data()[0])
+		sec_elem = Article(get_articles_data()[1])
+		self.assertEqual(type(first_elem.name), type("bruh"))
+		self.assertEqual(type(second_elem.name), type("bruh"))
+
+	def test_typename(self):
+		first_elem = Article(get_articles_data()[0])
+		sec_elem = Article(get_articles_data()[1])
+		self.assertEqual(type(first_elem.text), type("bruh"))
+		self.assertEqual(type(sec_elem.text), type("bruh"))
+
+	def test_inst_list(self):
+		self.assertEqual(len(articles_instance_list), 2)
+
+
 class Test_Weather_Data(unittest.TestCase):
 	def test1_identifier(self):
 		if "full_weather_dictionary" in CACHE_DICTION:
@@ -740,7 +768,7 @@ class Test_Weather_Data(unittest.TestCase):
 			z = 0
 
 		tup_test = (x,y,z)
-		self.assertEqual(tup_test, (1,1,1))
+		self.assertEqual(tup_test, (1,1,1), "Some States are missing from your dictionary!")
 
 	#def test4_weather_dictionary(self):
 		
